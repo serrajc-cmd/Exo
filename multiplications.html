@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Multiplications (Modes de jeu)</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1.5rem 1rem;
+            box-sizing: border-box;
+        }
+        .container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 450px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        h1 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.8rem;
+        }
+        /* Un seul ecran visible a la fois */
+        .screen {
+            display: none;
+            flex-direction: column;
+        }
+        .screen.is-visible {
+            display: flex;
+        }
+        .back-link.is-hidden {
+            display: none;
+        }
+        .result-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            justify-content: center;
+        }
+        button.secondary {
+            background-color: white;
+            color: #3b82f6;
+            border: 2px solid #cbd5e1;
+        }
+        button.secondary:hover {
+            background-color: #f8fafc;
+            border-color: #3b82f6;
+        }
+        
+        /* Styles pour le menu des modes */
+        .options {
+            text-align: left;
+            background: #f8fafc;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            border: 1px solid #e2e8f0;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-size: 1.05rem;
+            cursor: pointer;
+            color: #334155;
+        }
+        .options label:last-child {
+            margin-bottom: 0;
+        }
+        .options input[type="radio"] {
+            margin-right: 0.5rem;
+            transform: scale(1.2);
+        }
+
+        /* Réglage de la durée par question */
+        .duration-setting {
+            background: #f8fafc;
+            padding: 1.2rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+            text-align: left;
+            color: #334155;
+        }
+        .duration-setting label {
+            font-size: 1.05rem;
+            display: block;
+            margin-bottom: 0.6rem;
+        }
+        .duration-setting input[type="number"] {
+            font-size: 1.2rem;
+            width: 90px;
+            padding: 0.4rem;
+            margin-bottom: 0;
+        }
+        .hint {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-left: 0.6rem;
+        }
+        .error-msg {
+            color: #ef4444;
+            font-size: 0.95rem;
+            font-weight: bold;
+            margin-top: 0.7rem;
+            display: none;
+        }
+
+        .question {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 1.5rem 0;
+            color: #1e293b;
+        }
+        input[type="number"] {
+            font-size: 2rem;
+            padding: 0.5rem;
+            width: 120px;
+            text-align: center;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            outline: none;
+        }
+        input[type="number"]:focus {
+            border-color: #3b82f6;
+        }
+        button {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #2563eb;
+        }
+        .progress {
+            color: #64748b;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        .timer {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ef4444;
+            margin-top: 0.5rem;
+        }
+        .score {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #10b981;
+            margin: 1rem 0 0.5rem 0;
+        }
+        .total-time {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #3b82f6;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Styles pour le bilan des erreurs */
+        #mistakes-container {
+            text-align: left;
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            display: none;
+        }
+        #mistakes-container h3 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            color: #334155;
+            margin-bottom: 0.75rem;
+        }
+        #mistakes-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        #mistakes-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 1.1rem;
+        }
+        #mistakes-list li:last-child {
+            border-bottom: none;
+        }
+        .correct-ans {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        /* Lien de retour vers l'accueil */
+        .back-link {
+            margin-top: 1.5rem;
+            padding-top: 1.2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        .back-link a {
+            color: #3b82f6;
+            font-size: 0.95rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .back-link a:hover,
+        .back-link a:focus-visible {
+            text-decoration: underline;
+        }
+        .wrong-ans {
+            color: #ef4444;
+            text-decoration: line-through;
+            font-size: 0.95rem;
+        }
+        .timeout-ans {
+            color: #ef4444;
+            font-style: italic;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Écran d'accueil -->
+    <div id="start-screen" class="screen is-visible">
+        <h1>Test de Multiplications</h1>
+        
+        <div class="options">
+            <label>
+                <input type="radio" name="gameMode" value="result" checked>
+                <strong>Mode Classique :</strong> Trouver le résultat (ex: 3 x 4 = ?)
+            </label>
+            <label>
+                <input type="radio" name="gameMode" value="missing">
+                <strong>Mode Inversé :</strong> Trouver le nombre manquant (ex: 3 x ? = 12)
+            </label>
+        </div>
+
+        <div class="duration-setting">
+            <label for="duration-input">Durée par question, en secondes :</label>
+            <input type="number" id="duration-input" value="20" min="5" max="20" step="1">
+            <span class="hint">entre 5 et 20</span>
+            <div class="error-msg" id="duration-error"></div>
+        </div>
+
+        <p><strong>Attention :</strong> vous n'avez que <span id="duration-recap">20</span> secondes par question !</p>
+        <button onclick="startGame()">Commencer le test</button>
+    </div>
+
+    <!-- Écran de question -->
+    <div id="question-screen" class="screen">
+        <div class="progress" id="progress">Question 1 / 20</div>
+        <div class="timer" id="timer-text">Temps : 20s</div>
+        <div class="question" id="question-text">? x ?</div>
+        <input type="number" id="answer-input" autocomplete="off" autofocus>
+        <br>
+        <button onclick="submitAnswer()">Valider</button>
+    </div>
+
+    <!-- Écran de résultat -->
+    <div id="result-screen" class="screen">
+        <h1>Test Terminé !</h1>
+        <div class="score" id="final-score">Votre note : 0 / 20</div>
+        <div class="total-time" id="total-time">Temps total : 0s</div>
+        
+        <div id="mistakes-container">
+            <h3>Bilan des erreurs :</h3>
+            <ul id="mistakes-list"></ul>
+        </div>
+
+        <div class="result-actions">
+            <button onclick="startGame()">Nouvelle partie</button>
+            <button class="secondary" onclick="showScreen(startScreen)">Changer les réglages</button>
+        </div>
+    </div>
+
+    <div class="back-link" id="back-link">
+        <a href="index.html">Retour à l’accueil</a>
+    </div>
+</div>
+
+<script>
+    let currentQuestionIndex = 0;
+    let score = 0;
+    const totalQuestions = 20;
+    let currentAnswer = 0;
+    let currentNum1 = 0;
+    let currentNum2 = 0;
+    let currentProduct = 0;
+    let mistakes = [];
+    let askedQuestions = new Set();
+    let selectedMode = 'result';
+
+    const MIN_DURATION = 5;
+    const MAX_DURATION = 20;
+    let questionDuration = MAX_DURATION;
+
+    let timeLeft = questionDuration;
+    let timerInterval;
+    let sessionStartTime = 0;
+
+    const startScreen = document.getElementById('start-screen');
+    const questionScreen = document.getElementById('question-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const progressText = document.getElementById('progress');
+    const questionText = document.getElementById('question-text');
+    const answerInput = document.getElementById('answer-input');
+    const finalScore = document.getElementById('final-score');
+    const timerText = document.getElementById('timer-text');
+    const mistakesContainer = document.getElementById('mistakes-container');
+    const mistakesList = document.getElementById('mistakes-list');
+    const durationInput = document.getElementById('duration-input');
+    const durationError = document.getElementById('duration-error');
+    const durationRecap = document.getElementById('duration-recap');
+    const totalTimeText = document.getElementById('total-time');
+    const backLink = document.getElementById('back-link');
+
+    // Affiche un seul ecran a la fois. Le lien de retour est masque
+    // pendant les questions pour ne pas quitter un test en cours par megarde.
+    function showScreen(screenToShow) {
+        [startScreen, questionScreen, resultScreen].forEach(screen => {
+            screen.classList.toggle('is-visible', screen === screenToShow);
+        });
+        backLink.classList.toggle('is-hidden', screenToShow === questionScreen);
+    }
+
+    answerInput.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            submitAnswer();
+        }
+    });
+
+    // Vérifie la durée saisie. Renvoie true si elle est valide et appliquée.
+    function applyDuration() {
+        const value = parseInt(durationInput.value, 10);
+
+        if (isNaN(value) || value < MIN_DURATION || value > MAX_DURATION) {
+            durationError.textContent = `Durée impossible : choisissez un nombre entre ${MIN_DURATION} et ${MAX_DURATION} secondes. La durée reste à ${questionDuration}s.`;
+            durationError.style.display = 'block';
+            durationInput.value = questionDuration;
+            return false;
+        }
+
+        questionDuration = value;
+        durationRecap.textContent = questionDuration;
+        durationError.style.display = 'none';
+        return true;
+    }
+
+    durationInput.addEventListener('change', applyDuration);
+
+    function startGame() {
+        if (!applyDuration()) {
+            return;
+        }
+
+        const modeRadios = document.getElementsByName('gameMode');
+        for (const radio of modeRadios) {
+            if (radio.checked) {
+                selectedMode = radio.value;
+                break;
+            }
+        }
+
+        score = 0;
+        currentQuestionIndex = 0;
+        mistakes = [];
+        askedQuestions.clear();
+        mistakesList.innerHTML = '';
+        sessionStartTime = Date.now();
+        
+        showScreen(questionScreen);
+
+        nextQuestion();
+    }
+
+    function startTimer() {
+        timeLeft = questionDuration;
+        timerText.textContent = `Temps : ${timeLeft}s`;
+        
+        clearInterval(timerInterval);
+        
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            timerText.textContent = `Temps : ${timeLeft}s`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                mistakes.push({
+                    correctEquation: `${currentNum1} x ${currentNum2} = ${currentProduct}`,
+                    userAnswer: "Temps écoulé",
+                    isTimeout: true
+                });
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        
+        if (currentQuestionIndex > totalQuestions) {
+            endGame();
+            return;
+        }
+
+        let questionKey;
+        do {
+            currentNum1 = Math.ceil(Math.random() * 9);
+            currentNum2 = Math.ceil(Math.random() * 9);
+            questionKey = `${currentNum1}x${currentNum2}`;
+        } while (askedQuestions.has(questionKey));
+
+        askedQuestions.add(questionKey);
+        currentProduct = currentNum1 * currentNum2;
+
+        let displayString = "";
+
+        if (selectedMode === 'result') {
+            currentAnswer = currentProduct;
+            displayString = `${currentNum1} x ${currentNum2} = ?`;
+        } else if (selectedMode === 'missing') {
+            if (Math.random() > 0.5) {
+                currentAnswer = currentNum2;
+                displayString = `${currentNum1} x ? = ${currentProduct}`;
+            } else {
+                currentAnswer = currentNum1;
+                displayString = `? x ${currentNum2} = ${currentProduct}`;
+            }
+        }
+
+        progressText.textContent = `Question ${currentQuestionIndex} / ${totalQuestions}`;
+        questionText.textContent = displayString;
+        
+        startTimer();
+
+        answerInput.value = '';
+        answerInput.focus();
+    }
+
+    function submitAnswer() {
+        const userAnswer = parseInt(answerInput.value, 10);
+        
+        if (isNaN(userAnswer)) return; 
+
+        clearInterval(timerInterval);
+
+        if (userAnswer === currentAnswer) {
+            score++;
+        } else {
+            mistakes.push({
+                correctEquation: `${currentNum1} x ${currentNum2} = ${currentProduct}`,
+                userAnswer: userAnswer,
+                isTimeout: false
+            });
+        }
+        
+        nextQuestion();
+    }
+
+    // 95 -> "1 min 35s", 42 -> "42s"
+    function formatDuration(totalSeconds) {
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+
+        if (minutes === 0) {
+            return `${seconds}s`;
+        }
+        return `${minutes} min ${seconds}s`;
+    }
+
+    function endGame() {
+        clearInterval(timerInterval);
+        showScreen(resultScreen);
+
+        finalScore.textContent = `Votre note : ${score} / 20`;
+
+        const elapsedSeconds = Math.round((Date.now() - sessionStartTime) / 1000);
+        totalTimeText.textContent = `Temps total : ${formatDuration(elapsedSeconds)}`;
+
+        if (mistakes.length === 0) {
+            mistakesContainer.style.display = 'none';
+        } else {
+            mistakesContainer.style.display = 'block';
+            mistakes.forEach(mistake => {
+                const li = document.createElement('li');
+                
+                let userFormatting = '';
+                if (mistake.isTimeout) {
+                    userFormatting = `( <span class="timeout-ans">Temps écoulé</span> )`;
+                } else {
+                    userFormatting = `( <span class="wrong-ans">${mistake.userAnswer}</span> )`;
+                }
+
+                li.innerHTML = `<span class="correct-ans">${mistake.correctEquation}</span> ${userFormatting}`;
+                mistakesList.appendChild(li);
+            });
+        }
+    }
+</script>
+
+</body>
+</html>

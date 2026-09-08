@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil — Exercices de calcul</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+        .container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 450px;
+            width: 100%;
+        }
+        h1 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.8rem;
+        }
+        p {
+            color: #334155;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.4rem;
+            margin: 1.8rem 0;
+        }
+        .grid span {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 0.6rem 0;
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #64748b;
+        }
+        .grid span:nth-child(3) {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+        .link-button {
+            display: inline-block;
+            background-color: #3b82f6;
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .link-button:hover,
+        .link-button:focus-visible {
+            background-color: #2563eb;
+        }
+        .note {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Bienvenue !</h1>
+    <p>Ici, on s'entraîne aux tables de multiplication. Vingt questions, un chrono, et un bilan des erreurs à la fin.</p>
+
+    <div class="grid" aria-hidden="true">
+        <span>6 x 7</span>
+        <span>8 x 4</span>
+        <span>42</span>
+        <span>9 x 3</span>
+        <span>5 x 5</span>
+        <span>7 x 8</span>
+        <span>3 x 6</span>
+        <span>4 x 9</span>
+    </div>
+
+    <a class="link-button" href="multiplications.html">Faire le test de multiplications</a>
+    <p class="note">Deux modes au choix : trouver le résultat ou le nombre manquant.</p>
+</div>
+
+</body>
+</html>
