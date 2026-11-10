@@ -76,6 +76,35 @@
             font-size: 0.9rem;
             margin-bottom: 0;
         }
+        .separator {
+            border: 0;
+            border-top: 1px solid #e2e8f0;
+            margin: 2rem 0 1.5rem;
+        }
+        .posee {
+            display: grid;
+            justify-content: center;
+            grid-template-columns: repeat(5, 2rem);
+            margin: 0.6rem 0 1.8rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #334155;
+            font-variant-numeric: tabular-nums;
+        }
+        .posee span {
+            height: 2.2rem;
+            line-height: 2.2rem;
+        }
+        .posee span:not(:nth-child(5n+1)) {
+            border-left: 1px solid #cbd5e1;
+        }
+        .posee span:nth-child(5n) {
+            border-right: 1px solid #cbd5e1;
+        }
+        .posee .res {
+            border-top: 2px solid #2c3e50;
+            color: #3b82f6;
+        }
     </style>
 </head>
 <body>
@@ -97,6 +126,19 @@
 
     <a class="link-button" href="multiplications.html">Faire le test de multiplications</a>
     <p class="note">Deux modes au choix : trouver le résultat ou le nombre manquant.</p>
+
+    <hr class="separator">
+
+    <p>Tu peux aussi poser des opérations comme sur ton cahier : multiplications (avec ou sans virgule) et divisions euclidiennes. Tu écris les chiffres directement à l'écran avec le stylet.</p>
+
+    <div class="posee" aria-hidden="true">
+        <span></span><span></span><span>3</span><span>4</span><span>5</span>
+        <span>×</span><span></span><span></span><span>2</span><span>6</span>
+        <span class="res"></span><span class="res">8</span><span class="res">9</span><span class="res">7</span><span class="res">0</span>
+    </div>
+
+    <a class="link-button" href="operations-posees-cm2.html">Poser des opérations</a>
+    <p class="note">Dix opérations par série, avec la correction détaillée étape par étape.</p>
 </div>
 
 </body>
